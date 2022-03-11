@@ -1,0 +1,22 @@
+{
+  "name": "ventaonline",
+  "version": "1.0.0",
+  "description": "Proyecto de venta Online - 2016328",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luis Ortiz",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt-nodejs": "^0.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "jwt-simple": "^0.5.6",
+    "moment": "^2.29.1",
+    "nodemon": "^2.0.15",
+    "pdfkit": "^0.13.0",
+    "pdfkit-construct": "^1.2.3",
+    "pdfmake": "^0.2.4"
+  }
+}
