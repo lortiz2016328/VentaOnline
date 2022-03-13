@@ -1,5 +1,4 @@
 const Facturas = require('../models/facturas.model');
-const Usuarios = require('../models/usuarios.model');
 const Productos = require('../models/productos.model');
 
 function listarFacturas(req, res) {
@@ -49,9 +48,9 @@ function productosAgotados(req, res) {
     } else {
         Productos.find({ cantidad: '0' }, (err, productoAgotados) => {
             if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
-            if (productoAgotados == '') return res.status(500).send({ mensaje: "Error en la busqueda" });
+            if (productoAgotados == '') return res.status(500).send({ mensaje: "Si hay Productos en existencia" });
 
-            return res.status(200).send({ 'Productos agotados': productoAgotados })
+            return res.status(200).send({ 'Productos Agotados': productoAgotados })
         })
     }
 }
@@ -60,7 +59,7 @@ function productoMasVendido(req, res) {
     Productos.find((err, productoEncontrado) => {
         if (err) return res.send({ mensaje: "Error: " + err });
 
-        return res.send({ 'Mas vendido': productoEncontrado })
+        return res.send({ 'Más vendido': productoEncontrado })
 
     }).sort({
         vendido: -1,

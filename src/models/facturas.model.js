@@ -11,6 +11,6 @@ const FacturasSchema = Schema({
         subTotal: Number
     }],
     totalFactura: Number
-});
+})
 
 module.exports = mongoose.model('Facturas', FacturasSchema);

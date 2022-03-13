@@ -5,12 +5,10 @@ const md_autenticacion = require('../middlewares/autenticacion');
 var api = express.Router();
 
 api.get('/productos', productosController.obtenerProducto);
-api.get('/productos/obtenerPorId/:idProductos', productosController.obtenerProductoPorId);
-api.get('/productos/obtenerPorNombre', productosController.obtenerProductoPorNombre);
-api.get('/productos/obtenerPorCategoria', productosController.obtenerProductoPorCategoria);
+api.get('/productos/obtenerPorNombre/:nombreProducto', productosController.obtenerProductoPorNombre);
+api.get('/productos/obtenerPorCategoria', md_autenticacion.Auth, productosController.obtenerProductoPorCategoria);
 api.post('/productos/agregarProducto', md_autenticacion.Auth, productosController.agregarProducto);
 api.put('/productos/editarProducto/:idProducto', md_autenticacion.Auth, productosController.editarProducto);
-api.delete('/productos/eliminarProducto/:idProducto', md_autenticacion.Auth, productosController.eliminarProducto);
-api.put('/productos/stock/:idProducto', md_autenticacion.Auth, productosController.stock);
+api.put('/productos/cantidadEnStock/:idProducto', md_autenticacion.Auth, productosController.cantidadEnStock)
 
 module.exports = api;

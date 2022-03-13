@@ -14,6 +14,6 @@ var UsuariosSchema = Schema({
         subTotal: Number
     }],
     totalCarrito: Number
-});
+})
 
 module.exports = mongoose.model('Usuarios', UsuariosSchema);

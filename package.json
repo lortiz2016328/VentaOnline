@@ -4,7 +4,8 @@
   "description": "Proyecto de venta Online - 2016328",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
   },
   "author": "Luis Ortiz",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "express": "^4.17.3",
     "jwt-simple": "^0.5.6",
     "moment": "^2.29.1",
+    "mongoose": "^6.2.6",
     "nodemon": "^2.0.15",
     "pdfkit": "^0.13.0",
     "pdfkit-construct": "^1.2.3",

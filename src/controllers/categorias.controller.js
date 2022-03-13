@@ -6,31 +6,8 @@ function obtenerCategoria(req, res) {
         if (err) return res.send({ mensaje: "Error:" + err });
 
         return res.send({ categorias: categoriaObtenida })
-    });
-}
-
-function obtenerCategoriaPorId(req, res) {
-    var idCatego = req.params.idCategoria;
-
-    Categorias.findById(idCatego, (err, categoriaEncontrada) => {
-        if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
-        if (!categoriaEncontrada) return res.status(500).send({ mensaje: "Error en la busqueda" });
-
-        return res.status(200).send({ categoria: categoriaEncontrada });
     })
 }
-
-function obtenerCategoriaPorNombre(req, res) {
-    var nombreCatego = req.params.nombreCategoria;
-
-    Productos.find({ nombre: { $regex: nombreCatego, $options: 'i' } }, (err, categoriaEncontrada) => {
-        if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
-        if (!categoriaEncontrada) return res.status(500).send({ mensaje: "Error al encontrar la categoria" });
-
-        return res.status(200).send({ producto: categoriaEncontrada });
-    })
-}
-
 
 function agregarCategoria(req, res) {
     var parametros = req.body;
@@ -40,16 +17,15 @@ function agregarCategoria(req, res) {
         return res.status(500).send({ mensaje: "No eres admin, no puedes agregar" });
     } else {
 
+        if (parametros.nombreCatego) {
 
-        if (parametros.nombre) {
-
-            Categorias.find({ nombreCategoria: parametros.nombre }).exec((err, categoriasEncontradas) => {
-                for (let i = 0; i < categoriasEncontradas.length; i++) {
-                    if (categoriasEncontradas[i].nombreCategoria === parametros.nombre) return res.status(500).send({ mensaje: "Error al agregar" });
+            Categorias.find({ nombreCategoria: parametros.nombreCatego }).exec((err, categoriaEncontrada) => {
+                for (let i = 0; i < categoriaEncontrada.length; i++) {
+                    if (categoriaEncontrada[i].nombreCategoria === parametros.nombreCatego) return res.status(500).send({ mensaje: "Error al agregar" });
 
                 }
-                
-                categoriaModel.nombreCategoria = parametros.nombre;
+
+                categoriaModel.nombreCategoria = parametros.nombreCatego;
                 categoriaModel.save((err, categoriaGuardada) => {
                     if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
                     if (!categoriaGuardada) return res.status(500).send({ mensaje: "Error al agregar" });
@@ -100,7 +76,7 @@ function eliminarCategoria(req, res) {
 
                         Productos.updateMany({ idCategoria: idCatego }, { idCategoria: categoriaGuardada._id }, (err, categoriaActualizada) => {
                             if (err) return res.status(500).send({ mensaje: "Error al actualizar" })
-                            Categorias.findByIdAndDelete(idCat, { new: true }, (categoriaEliminada) => {
+                            Categorias.findByIdAndDelete(idCatego, { new: true }, (categoriaEliminada) => {
                                 if (err) return res.status(500).send({ mensaje: "Error al eliminar" })
                                 if (categoriaEliminada) return res.status(500).send({ mensaje: "Error al eliminar" })
 
@@ -131,8 +107,6 @@ function eliminarCategoria(req, res) {
 
 module.exports = {
     obtenerCategoria,
-    obtenerCategoriaPorId,
-    obtenerCategoriaPorNombre,
     agregarCategoria,
     editarCategoria,
     eliminarCategoria

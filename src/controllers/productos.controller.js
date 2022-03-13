@@ -2,60 +2,48 @@ const Productos = require('../models/productos.model');
 const Categorias = require('../models/categorias.model');
 
 function obtenerProducto(req, res) {
-    Productos.find((err, productosEncontrados) => {
-        if (err) return res.send({ mensaje: "Error: " + err });
-
         Productos.find((err, productosObtenidos) => {
             if (err) return res.send({ mensaje: "Error: " + err });
 
             return res.send({
-                'Más vendido': productosEncontrados,
                 'Lista de productos': productosObtenidos
             })
         })
-    }).sort({
+    .sort({
         vendido: -1,
     }).limit(5)
 }
 
-function obtenerProductoPorId(req, res) {
-    var idProduct = req.params.idProductos;
+function obtenerProductoPorNombre(req, res) {
 
-    Productos.findById(idProduct, (err, productoEncontrado) => {
-        if (err) return res.status(500).send({ mensaje: "Error rn la peticion" });
-        if (!productoEncontrado) return res.status(500).send({ mensaje: "Error en la busqueda" });
+    var nomProd = req.params.nombreProducto;
+
+    Productos.find({ nombre: { $regex: nomProd, $options: 'i' } }, (err, productoEncontrado) => {
+        if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
+        if (!productoEncontrado) return res.status(404).send({ mensaje: "Error, no se encontraron productos" });
 
         return res.status(200).send({ producto: productoEncontrado });
     })
 }
 
-function obtenerProductoPorNombre(req, res) {
-    var parametros = req.body;
-    if (parametros.nombre) {
-        Productos.find({ nombre: { $regex: parametros.nombre, $options: 'i' } }, (err, productoObtenido) => {
-            if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
-            if (!productoObtenido) return res.status(404).send({ mensaje: "Error, no se encontraron productos" });
-
-            return res.status(200).send({ producto: productoObtenido });
-        })
-    } else {
-        return res.status(500).send({ mensaje: "Rellenar todos los campos" })
-    }
-
-}
-
 function obtenerProductoPorCategoria(req, res) {
-    var parametros = req.body;
 
-    Categorias.findOne({ nombreCategoria: parametros.nombre }, (err, categoriaEncontrado) => {
+    var idCategoria;
+    var params = req.body
+    if (req.user.rol == 'Admin') {
+        return res.status(500).send({ mensaje: "Eres admin, no puedes ver los productos" })
+    }
+    if (!params.nombre) return res.status(500).send({ mensaje: "Agrege los parametros necesarios" })
+
+    Categorias.findOne({ nombreCategoria: params.nombre }).exec((err, categoriaEncontrada) => {
         if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
-        if (!categoriaEncontrado) return res.status(500).send({ mensaje: "Error en la busqueda" });
+        if (!categoriaEncontrada) return res.status(500).send({ mensaje: "La categoria no existe" });
+        idCategoria = categoriaEncontrada._id
 
-        Productos.find({ idCategoria: categoriaEncontrada._id }, (err, productoEncontrado) => {
-            if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
-            if (!productoEncontrado) return res.status(500).send({ mensaje: "Error al encontrar el producto" });
-
-            return res.status(200).send({ producto: productoEncontrado });
+        Productos.find({ categoriaProducto: idCategoria }).exec((err, ProductoEncontrado) => {
+            if (err) return res.status(500).send({ mensaje: "Error en la peticion" })
+            if (!ProductoEncontrado) return res.status(500).send({ mensaje: "No hay Productos" });
+            if (ProductoEncontrado) return res.status(200).send({ ProductoEncontrado })
         })
     })
 }
@@ -115,22 +103,7 @@ function editarProducto(req, res) {
     }
 }
 
-function eliminarProducto(req, res) {
-    var idProduct = req.params.idProducto;
-
-    if (req.user.rol == 'Cliente') {
-        return res.status(500).send({ mensaje: "No eres admin, no puedes eliminar" });
-    } else {
-        Productos.findByIdAndDelete(idProduct, (err, productoEliminado) => {
-            if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
-            if (!productoEliminado) return res.status(404).send({ mensaje: "Error al eliminar" });
-
-            return res.status(200).send({ producto: productoEliminado });
-        })
-    }
-}
-
-function stock(req, res) {
+function cantidadEnStock(req, res) {
     const productoId = req.params.idProducto;
     const parametros = req.body;
 
@@ -140,7 +113,7 @@ function stock(req, res) {
     } else {
         let comparar = 0;
         Productos.findById(productoId, (err, productoEncontrado) => {
-            if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
+            if (err) return res.status(500).send({ mensaje: "Error en la peticio1" });
             if (!productoEncontrado) return res.status(500).send({ mensaje: "Error al editar" });
 
             if (parametros.cantidad < 0) {
@@ -149,33 +122,30 @@ function stock(req, res) {
 
                 Productos.findByIdAndUpdate(productoId, { $inc: { cantidad: parametros.cantidad } }, { new: true },
                     (err, productoActualizado) => {
-                        if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
+                        if (err) return res.status(500).send({ mensaje: "Error en la peticio2" });
                         if (!productoActualizado) return res.status(500).send({ mensaje: "Error al editar" });
 
                         return res.status(200).send({ producto: productoActualizado });
-                    });
+                    })
             } else {
                 Productos.findByIdAndUpdate(productoId, { $inc: { cantidad: parametros.cantidad } }, { new: true },
                     (err, productoActualizado) => {
-                        if (err) return res.status(500).send({ mensaje: "Error en la peticion" });
+                        if (err) return res.status(500).send({ mensaje: "Error en la peticio3" });
                         if (!productoActualizado) return res.status(500).send({ mensaje: "Error al editar" });
 
                         return res.status(200).send({ producto: productoActualizado });
                     })
             }
-        });
+        })
 
     }
 }
 
-
 module.exports = {
     obtenerProducto,
-    obtenerProductoPorId,
     obtenerProductoPorNombre,
     obtenerProductoPorCategoria,
     agregarProducto,
     editarProducto,
-    eliminarProducto,
-    stock
+    cantidadEnStock
 }

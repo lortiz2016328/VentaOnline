@@ -9,5 +9,4 @@ api.get('/facturas/listarProducto', md_autenticacion.Auth, facturasController.li
 api.get('/productos/productosAgotados',md_autenticacion.Auth, facturasController.productosAgotados);
 api.get('/productos/masVendido',facturasController.productoMasVendido);
 
-
 module.exports = api;
